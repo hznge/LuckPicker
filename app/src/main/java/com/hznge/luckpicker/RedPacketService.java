@@ -152,7 +152,7 @@ public class RedPacketService extends AccessibilityService {
                             Log.d(TAG, "findRedPacket: 可点击:" + parent.isClickable());
                             isOpenedRedPacket = true;
 
-                            // openRedPacket(parent);
+                            openRedPacket(parent);
                             break;
                         }
                         parent = parent.getParent();

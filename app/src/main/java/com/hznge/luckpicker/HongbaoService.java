@@ -9,42 +9,38 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.Toast;
-
-import com.hznge.luckpicker.util.HongbaoSignature;
-import com.hznge.luckpicker.util.PowerUtil;
 
 import java.util.List;
 
-public class HongbaoService extends AccessibilityService implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "HongbaoService";
+import com.hznge.luckpicker.util.*;
 
-    //private static final String WECHAT_DETAILS_EN = "Details";
+public class HongbaoService extends AccessibilityService implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String WECHAT_DETAILS_EN = "Details";
     private static final String WECHAT_DETAILS_CH = "红包详情";
-    // private static final String WECHAT_BETTER_LUCK_EN = "Better luck next time!";
+    private static final String WECHAT_BETTER_LUCK_EN = "Better luck next time!";
     private static final String WECHAT_BETTER_LUCK_CH = "手慢了";
     private static final String WECHAT_EXPIRES_CH = "已超过24小时";
     private static final String WECHAT_VIEW_SELF_CH = "查看红包";
     private static final String WECHAT_VIEW_OTHERS_CH = "领取红包";
     private static final String WECHAT_NOTIFICATION_TIP = "[微信红包]";
-    private static final String WECHAT_LUCKMONEY_RECEIVE_ACTIVITY = "com.tencent.mm.plugin.luckymoney.ui.En_fba4b94f";
-    private static final String WECHAT_LUCKMONEY_DETAIL_ACTIVITY = "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI";
-    private static final String WECHAT_LUCKMONEY_GENERAL_ACTIVITY = "com.tencent.mm.ui.LauncherUI";
-    private static final String WECHAT_LUCKMONEY_CHATTING_ACTIVITY = "com.tencent.mm.ui.ChattingUI";
+    private static final String WECHAT_LUCKMONEY_RECEIVE_ACTIVITY = "En_fba4b94f";
+    private static final String WECHAT_LUCKMONEY_DETAIL_ACTIVITY = "LuckyMoneyDetailUI";
+    private static final String WECHAT_LUCKMONEY_GENERAL_ACTIVITY = "LauncherUI";
+    private static final String WECHAT_LUCKMONEY_CHATTING_ACTIVITY = "ChattingUI";
     private String currentActivityName = WECHAT_LUCKMONEY_GENERAL_ACTIVITY;
 
     private AccessibilityNodeInfo rootNodeInfo, mReceiveNode, mUnpackNode;
     private boolean mLuckyMoneyPicked, mLuckyMoneyReceived;
     private int mUnpackCount = 0;
     private boolean mMutex = false, mListMutex = false, mChatMutex = false;
-
     private HongbaoSignature signature = new HongbaoSignature();
 
     private PowerUtil powerUtil;
@@ -90,14 +86,12 @@ public class HongbaoService extends AccessibilityService implements
         if (mLuckyMoneyReceived && !mLuckyMoneyPicked && (mReceiveNode != null)) {
             mMutex = true;
 
-            Log.d(TAG, "watchChat: In getting...");
             mReceiveNode.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
             mLuckyMoneyReceived = false;
             mLuckyMoneyPicked = true;
         }
         /* 如果戳开但还未领取 */
         if (mUnpackCount == 1 && (mUnpackNode != null)) {
-            Log.d(TAG, "watchChat: Opening...");
             int delayFlag = sharedPreferences.getInt("pref_open_delay", 0) * 1000;
             new android.os.Handler().postDelayed(
                     new Runnable() {
@@ -178,8 +172,6 @@ public class HongbaoService extends AccessibilityService implements
             return false;
 
         List<AccessibilityNodeInfo> nodes = eventSource.findAccessibilityNodeInfosByText(WECHAT_NOTIFICATION_TIP);
-        nodes.addAll(eventSource.findAccessibilityNodeInfosByText("微信红包"));
-        nodes.addAll(eventSource.findAccessibilityNodeInfosByText("查看红包"));
         //增加条件判断currentActivityName.contains(WECHAT_LUCKMONEY_GENERAL_ACTIVITY)
         //避免当订阅号中出现标题为“[微信红包]拜年红包”（其实并非红包）的信息时误判
         if (!nodes.isEmpty() && currentActivityName.contains(WECHAT_LUCKMONEY_GENERAL_ACTIVITY)) {
@@ -249,12 +241,10 @@ public class HongbaoService extends AccessibilityService implements
     private void checkNodeInfo(int eventType) {
         if (this.rootNodeInfo == null) return;
 
-        /*
-        if (signature.commentString != null) {
-            // sendComment();
+        /*if (signature.commentString != null) {
+            sendComment();
             signature.commentString = null;
-        }
-        */
+        }*/
 
         /* 聊天会话窗口，遍历节点匹配“领取红包”和"查看红包" */
         AccessibilityNodeInfo node1 = (sharedPreferences.getBoolean("pref_watch_self", false)) ?
@@ -283,7 +273,7 @@ public class HongbaoService extends AccessibilityService implements
         /* 戳开红包，红包已被抢完，遍历节点匹配“红包详情”和“手慢了” */
         boolean hasNodes = this.hasOneOfThoseNodes(
                 WECHAT_BETTER_LUCK_CH, WECHAT_DETAILS_CH,
-                WECHAT_EXPIRES_CH); // WECHAT_BETTER_LUCK_EN, WECHAT_DETAILS_EN
+                WECHAT_BETTER_LUCK_EN, WECHAT_DETAILS_EN, WECHAT_EXPIRES_CH);
         if (mMutex && eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && hasNodes
                 && (currentActivityName.contains(WECHAT_LUCKMONEY_DETAIL_ACTIVITY)
                 || currentActivityName.contains(WECHAT_LUCKMONEY_RECEIVE_ACTIVITY))) {
@@ -291,29 +281,9 @@ public class HongbaoService extends AccessibilityService implements
             mLuckyMoneyPicked = false;
             mUnpackCount = 0;
             performGlobalAction(GLOBAL_ACTION_BACK);
-            //signature.commentString = generateCommentString();
+//            signature.commentString = generateCommentString();
         }
     }
-    /*
-    private void sendComment() {
-        try {
-            AccessibilityNodeInfo outNode =
-                    getRootInActiveWindow().getChild(0).getChild(0);
-            AccessibilityNodeInfo nodeToInput = outNode.getChild(outNode.getChildCount() - 1).getChild(0).getChild(1);
-
-            if ("android.widget.EditText".equals(nodeToInput.getClassName())) {
-                Bundle arguments = new Bundle();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    arguments.putCharSequence(AccessibilityNodeInfo
-                            .ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, signature.commentString);
-                    nodeToInput.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
-                }
-            }
-        } catch (Exception e) {
-            // Not supported
-        }
-    }
-    */
 
 
     private boolean hasOneOfThoseNodes(String... texts) {
@@ -355,7 +325,6 @@ public class HongbaoService extends AccessibilityService implements
 
     @Override
     public void onServiceConnected() {
-        Toast.makeText(this, "Hello", Toast.LENGTH_SHORT).show();
         super.onServiceConnected();
         this.watchFlagsFromPreference();
     }
@@ -379,10 +348,10 @@ public class HongbaoService extends AccessibilityService implements
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "Bye", Toast.LENGTH_SHORT).show();
         this.powerUtil.handleWakeLock(false);
         super.onDestroy();
     }
+
     /*
     private String generateCommentString() {
         if (!signature.others) return null;
@@ -398,6 +367,25 @@ public class HongbaoService extends AccessibilityService implements
             return "@" + signature.sender + " " + wordsArray[(int) (Math.random() * wordsArray.length)];
         } else {
             return wordsArray[(int) (Math.random() * wordsArray.length)];
+        }
+    }
+
+    private void sendComment() {
+        try {
+            AccessibilityNodeInfo outNode =
+                    getRootInActiveWindow().getChild(0).getChild(0);
+            AccessibilityNodeInfo nodeToInput = outNode.getChild(outNode.getChildCount() - 1).getChild(0).getChild(1);
+
+            if ("android.widget.EditText".equals(nodeToInput.getClassName())) {
+                Bundle arguments = new Bundle();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    arguments.putCharSequence(AccessibilityNodeInfo
+                            .ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, signature.commentString);
+                    nodeToInput.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+                }
+            }
+        } catch (Exception e) {
+            // Not supported
         }
     }
     */
