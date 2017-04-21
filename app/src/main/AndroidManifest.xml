@@ -22,7 +22,7 @@
         </activity>
 
         <service
-            android:name=".RedPacketService"
+            android:name=".services.RedPacketService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
@@ -36,7 +36,7 @@
             </meta-data>
         </service>
         <service
-            android:name=".HongbaoService"
+            android:name=".services.HongbaoService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

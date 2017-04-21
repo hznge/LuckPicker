@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LuckyPicker</string>
-    <string name="pick_up">抢红包</string>
-    <string name="description">需要权限抢红包,半自动</string>
-    <string name="desc">全自动抢红包</string>
-    <string name="service_status">当前辅助服务状态:</string>
+    <string name="pick_up">点我开启抢红包</string>
+    <string name="description">打开本服务,进行微信抢红包~,半自动</string>
+    <string name="desc">打开本服务,进行微信抢红包~,全自动</string>
+    <string name="service_status">当前抢红包服务状态:</string>
 </resources>

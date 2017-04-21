@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         for (AccessibilityServiceInfo info :
                 accessibilityServices) {
-            if (info.getId().equals(getPackageName() + "/.RedPacketService")) {
+            if (info.getId().equals(getPackageName() + ".services.RedPacketService")) {
                 isServiceEnabled = true;
             }
         }

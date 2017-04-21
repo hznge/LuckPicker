@@ -1,4 +1,4 @@
-package com.hznge.luckpicker;
+package com.hznge.luckpicker.services;
 
 import android.accessibilityservice.AccessibilityService;
 import android.app.KeyguardManager;
@@ -13,20 +13,20 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class RedPacketService extends AccessibilityService {
 
     private static final String TAG = "RedPacketService";
-    // 微信聊天天界面
-    private final String LAUCHER = "com.tencent.mm.ui.LauncherUI";
+    // 微信聊天界面
+    private final String LAUCHER = "LauncherUI";
     // 点击红包弹出界面
     private final String LUCKY_MONEY_DETAIL = "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI";
     // 红包领取后详情界面
     private final String LUCKY_MONEY_RECEIVER = "com.tencent.mm.plugin.luckymoney.ui.En_fba4b94f";
 
-    // 是否已经
+    private final String WECHAT_CHATTING = "ChattingUI";
+    // 是否已经打开
     private boolean isOpenedRedPacket;
 
     private boolean isOpenDetail = false;
@@ -35,7 +35,7 @@ public class RedPacketService extends AccessibilityService {
 
     private KeyguardManager.KeyguardLock mKeyguardLock;
 
-    private List<String> ids = Arrays.asList("bjj", "bi3");
+    // private List<String> ids = Arrays.asList("bjj", "bi3");
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -67,7 +67,7 @@ public class RedPacketService extends AccessibilityService {
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
                 String className = event.getClassName().toString();
                 // 是否为微信界面
-                if (LAUCHER.equals(className)) {
+                if (className.contains(LAUCHER) || className.contains(WECHAT_CHATTING)) {
                     // get current chat details' root view
                     AccessibilityNodeInfo rootNode = getRootInActiveWindow();
 
@@ -83,7 +83,7 @@ public class RedPacketService extends AccessibilityService {
                 if (isOpenDetail && LUCKY_MONEY_DETAIL.equals(className)) {
                     isOpenDetail = false;
 
-                    //backToHome();
+                    // backToHome();
                     performGlobalAction(GLOBAL_ACTION_BACK);
 
                     releaseWakeLock();
@@ -106,7 +106,8 @@ public class RedPacketService extends AccessibilityService {
         }
     }
 
-    /*private void openRedPacket(AccessibilityNodeInfo rootNode) {
+    /*
+    private void openRedPacket(AccessibilityNodeInfo rootNode) {
         if (rootNode == null) {
             Log.d(TAG, "openRedPacket: Null RootNode");
             return;
@@ -132,7 +133,8 @@ public class RedPacketService extends AccessibilityService {
     private void findRedPacket(AccessibilityNodeInfo rootNode) {
         if (rootNode != null) {
             // 从后开始往前找
-            for (int i = rootNode.getChildCount() - 1; i >= 0; i--) {
+            int childNodes = rootNode.getChildCount();
+            for (int i = childNodes - 1; i >= 0; i--) {
                 AccessibilityNodeInfo node = rootNode.getChild(i);
                 // 跳过空节点
                 if (node == null) {
@@ -152,7 +154,7 @@ public class RedPacketService extends AccessibilityService {
                             Log.d(TAG, "findRedPacket: 可点击:" + parent.isClickable());
                             isOpenedRedPacket = true;
 
-                            openRedPacket(parent);
+                            // openRedPacket(parent);
                             break;
                         }
                         parent = parent.getParent();
