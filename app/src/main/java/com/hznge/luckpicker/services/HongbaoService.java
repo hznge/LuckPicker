@@ -1,12 +1,14 @@
 package com.hznge.luckpicker.services;
 
 import android.accessibilityservice.AccessibilityService;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.hznge.luckpicker.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +20,10 @@ import java.util.regex.Pattern;
  * 抢红包主要的逻辑部分
  */
 public class HongbaoService extends AccessibilityService {
+    /**
+     * Log tag
+     */
+    private static final String TAG = "HongbaoService";
     /**
      * 允许的最大尝试次数
      */
@@ -61,7 +67,7 @@ public class HongbaoService extends AccessibilityService {
         switch (Stage.getInstance().getCurrentStage()) {
             case Stage.OPENING_STAGE:
                 // 调试信息，打印TTL
-                // Log.d("TTL", String.valueOf(ttl));
+                Log.d(TAG, "Opening State: " + String.valueOf(ttl));
 
                 /* 如果打开红包失败且还没到达最大尝试次数，重试 */
                 if (openHongbao(nodeInfo) == -1 && ttl < MAX_TTL) return;
@@ -94,7 +100,7 @@ public class HongbaoService extends AccessibilityService {
                         fetchedIdentifiers.add(id);
 
                         // 调试信息，在每次打开红包后打印出已经获取的红包
-                        // Log.d("fetched", Arrays.toString(fetchedIdentifiers.toArray()));
+                        Log.d(TAG, "fetched" + Arrays.toString(fetchedIdentifiers.toArray()));
 
                         Stage.getInstance().entering(Stage.OPENING_STAGE);
                         node.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
@@ -122,8 +128,11 @@ public class HongbaoService extends AccessibilityService {
         if (nodeInfo == null) return;
 
         /* 聊天会话窗口，遍历节点匹配“领取红包” */
-        List<AccessibilityNodeInfo> fetchNodes = nodeInfo.findAccessibilityNodeInfosByText("红包");
+        List<AccessibilityNodeInfo> fetchNodes = new ArrayList<>();
+        fetchNodes.addAll(nodeInfo.findAccessibilityNodeInfosByText("领取红包"));
+        fetchNodes.addAll(nodeInfo.findAccessibilityNodeInfosByText("查看红包"));
 
+        Log.d(TAG, "fetchHongbao: " + fetchNodes.toString());
         if (fetchNodes.isEmpty()) return;
 
         for (AccessibilityNodeInfo cellNode : fetchNodes) {
@@ -136,7 +145,7 @@ public class HongbaoService extends AccessibilityService {
         }
 
         // 调试信息，在每次fetch后打印出待抢红包
-        // Log.d("toFetch", Arrays.toString(nodesToFetch.toArray()));
+        Log.d(TAG, "toFetch" + Arrays.toString(nodesToFetch.toArray()));
     }
 
 
