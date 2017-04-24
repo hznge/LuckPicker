@@ -83,7 +83,7 @@ public class RedPacketService extends AccessibilityService {
                 if (isOpenDetail && LUCKY_MONEY_DETAIL.equals(className)) {
                     isOpenDetail = false;
 
-                    // backToHome();
+                    backToHome();
                     performGlobalAction(GLOBAL_ACTION_BACK);
 
                     releaseWakeLock();
@@ -200,7 +200,6 @@ public class RedPacketService extends AccessibilityService {
         return super.onUnbind(intent);
     }
 
-    /*
     private void backToHome() {
         Intent backHome = new Intent(Intent.ACTION_MAIN);
         backHome.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -209,7 +208,6 @@ public class RedPacketService extends AccessibilityService {
         performGlobalAction(GLOBAL_ACTION_BACK);
         startActivity(backHome);
     }
-    */
 
     private boolean isScreenOn() {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
