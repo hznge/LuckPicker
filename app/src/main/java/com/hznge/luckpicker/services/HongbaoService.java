@@ -27,6 +27,9 @@ import java.util.List;
 
 
 public class HongbaoService extends AccessibilityService implements SharedPreferences.OnSharedPreferenceChangeListener {
+    /**
+     * 微信红包上的几种辨识标示
+     */
     private static final String WECHAT_DETAILS_EN = "Details";
     private static final String WECHAT_DETAILS_CH = "红包详情";
     private static final String WECHAT_BETTER_LUCK_EN = "Better luck next time!";
@@ -35,6 +38,10 @@ public class HongbaoService extends AccessibilityService implements SharedPrefer
     private static final String WECHAT_VIEW_SELF_CH = "查看红包";
     private static final String WECHAT_VIEW_OTHERS_CH = "领取红包";
     private static final String WECHAT_NOTIFICATION_TIP = "[微信红包]";
+
+    /**
+     * 微信(com.tencent.mm)6.5.7中的Activity名
+     */
     private static final String WECHAT_LUCKMONEY_RECEIVE_ACTIVITY = "En_fba4b94f";
     private static final String WECHAT_LUCKMONEY_RECEIVE_ACTIVITY_1 = "LuckyMoneyReceiveUI";
     private static final String WECHAT_LUCKMONEY_DETAIL_ACTIVITY = "LuckyMoneyDetailUI";
@@ -42,8 +49,14 @@ public class HongbaoService extends AccessibilityService implements SharedPrefer
     private static final String WECHAT_LUCKMONEY_CHATTING_ACTIVITY = "ChattingUI";
     private String currentActivityName = WECHAT_LUCKMONEY_GENERAL_ACTIVITY;
 
+    /**
+     * @rootNodeInfo:
+     * @mReceiveNode:
+     * @mUnpackNode:
+     */
     private AccessibilityNodeInfo rootNodeInfo, mReceiveNode, mUnpackNode;
-    private boolean mLuckyMoneyPicked, mLuckyMoneyReceived;
+
+    private boolean mLuckyMoneyPicked, mLuckyMoneyReceived; // mLuckyMoneyPicked:已领取, mLuckyMoneyReceived:已收到但未领取
     private int mUnpackCount = 0;
     private boolean mMutex = false, mListMutex = false, mChatMutex = false;
     private HongbaoSignature signature = new HongbaoSignature();

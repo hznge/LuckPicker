@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="16dp">
+    android:paddingTop="16dp"
+    tools:context=".MainActivity">
 
     <Button
         android:id="@+id/pickMoney_MainActivity"
@@ -18,11 +18,11 @@
 
     <TextView
         android:id="@+id/text_accessible"
-        android:text="@string/service_status"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:textSize="16sp"
+        android:layout_below="@id/pickMoney_MainActivity"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/pickMoney_MainActivity"/>
+        android:text="@string/service_status"
+        android:textSize="16sp"/>
 
 </RelativeLayout>

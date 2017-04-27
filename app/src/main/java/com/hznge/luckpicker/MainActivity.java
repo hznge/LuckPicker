@@ -2,9 +2,9 @@ package com.hznge.luckpicker;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         for (AccessibilityServiceInfo info :
                 accessibilityServices) {
-            if (info.getId().equals(getPackageName() + ".services.RedPacketService")) {
+            if (info.getId().equals(getPackageName() + "./services.RedPacketService")) {
                 isServiceEnabled = true;
             }
         }
